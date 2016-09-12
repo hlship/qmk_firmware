@@ -1,10 +1,10 @@
-# ErgoDox EZ Default Configuration
+# Cursivetastic
 
-## Changelog
+This is based on the ErgoDox EZ default configuration, but is a complete rewrite.
 
-* Feb 2, 2016 (V1.1): 
-  * Made the right-hand quote key double as Cmd/Win on hold. So you get ' when you tap it, " when you tap it with Shift, and Cmd or Win when you hold it. You can then use it as a modifier, or just press and hold it for a moment (and then let go) to send a single Cmd or Win keystroke (handy for opening the Start menu on Windows).
+I use Clojure (via Boot) to build the main portion of the keymap:
 
-This is what we ship with out of the factory. :) The image says it all:
+    boot write-keymap -f keymap-gen.h
 
-![Default](default_highres.png)
+This makes it easier to define new layers in terms of just the keys that change on that
+layer.
