@@ -7,34 +7,35 @@
 (def keymap-pos
     "Maps keymap layer keyword to its position in KEYMAP"
     (zipmap (->> '[k50 k51 k52 k53 k54 k55 k56
-       k40 k41 k42 k43 k44 k45 k46
-       k30 k31 k32 k33 k34 k35
-       k20 k21 k22 k23 k24 k25 k26
-       k10 k11 k12 k13 k14
-       k05 k06 k04
-       k03 k02 k01
+     k40 k41 k42 k43 k44 k45 k46
+     k30 k31 k32 k33 k34 k35
+     k20 k21 k22 k23 k24 k25 k26
+     k10 k11 k12 k13 k14
+     k05 k06 k04
+     k03 k02 k01
 
-       k57 k58 k59 k5a k5b k5c k5d
-       k47 k48 k49 k4a k4b k4c k4d
-       k38 k39 k3a k3b k3c k3d
-       k27 k28 k29 k2a k2b k2c k2d
-       k19 k1a k1b k1c k1d
-       k07 k08
-       k09 k0c
-       k0b k0a]
-       (map keyword))
+     k57 k58 k59 k5a k5b k5c k5d
+     k47 k48 k49 k4a k4b k4c k4d
+     k38 k39 k3a k3b k3c k3d
+     k27 k28 k29 k2a k2b k2c k2d
+     k19 k1a k1b k1c k1d
+     k07 k08
+     k09 k0c
+     k0b k0a]
+     (map keyword))
     (iterate inc 0)))
 
 (defprotocol Render 
     (render [x]))
 
-
 (extend-protocol Render
 
     clojure.lang.Keyword
     (render [k]
-        (str "KC_" (-> k name str/upper-case))
-        )
+        (str "KC_" (-> k 
+            name
+            str/upper-case
+            (str/replace "-" "_"))))
 
     java.lang.String
     (render [s] s)
@@ -55,9 +56,35 @@
             (assoc args (keymap-pos k) (render v)))
         (vec (repeat keymap-arg-count  "KC_TRNS"))
         ks)]
+    ;; KEYMAP is a macro from ez.h that converts its arguments into nested arrays
+    ;; with an even more arcane ordering.
     (str "KEYMAP("
         (str/join ", " ordered)
         ")")))
+
+(defn control [x] (fn-call "LCTL" x))
+(defn alt [x] (fn-call "LALT" x))
+(defn gui [x] (fn-call "LGUI" x))
+
+(def mod-values
+   {:control "MOD_LCTL"
+   :shift "MOD_LSFT"
+   :alt "MOD_LALT"
+   :gui "MOD_LGUI"
+   })
+
+(defn momentary 
+    "Change layer while key held"
+    [layer] 
+    (fn-call "MO" layer))
+
+(defn one-shot 
+    "Activate layer just for next key"
+    [layer] (fn-call "OSL" layer))
+
+(defn toggle 
+    "Toggle layer until layer is toggled again"
+    [layer] (fn-call "TG" layer))
 
 (defn keymaps [& keymaps]
     (let [vk (vec keymaps)]
@@ -110,7 +137,7 @@
         :k01 :end
 
         ; :k10 - Clojure key
-        ; :k06 - FN
+        :k06  (momentary 1)
 
         :k57 :ralt
         :k58 :6
@@ -147,7 +174,47 @@
         :k0a :space
         :k0b :enter
         :k08 :rbracket
-        ; :k07 - FN
+        :k07 (momentary 1)
         :k09 :pgup
         :k0c :pgdown
-        })))
+    }
+        ;; Layer 1: Function keys and A/V controls
+        {
+            :k51 :f1
+            :k52 :f2  
+            :k53 :f3
+            :k54 :f4
+            :k55 :f5
+            :k58 :f6
+            :k59 :f7
+            :k5a :f8
+            :k5b :f9
+            :k5c :f10
+            :k4c :f11
+            :k3c :f12
+            :k2c :f13
+            :k1c :f14
+
+            :k4a :up
+            :k39 :left
+            :k3a :down
+            :k3b :right
+
+            :k42 :ms-up
+            :k31 :ms-left
+            :k32 :ms-down
+            :k33 :ms-right
+            :k41 :ms-btn1
+            :k43a :ms-btn2
+
+            :k29 :audio-mute
+            :k2a :audio-vol-down
+            :k2b :audio-vol-up
+
+            :k23 :media-play-pause
+            :k24 :media-prev-track
+            :k25 :media-next-track
+
+
+        }
+        )))
