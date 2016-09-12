@@ -215,6 +215,34 @@
             :k24 :media-prev-track
             :k25 :media-next-track
 
+            :k5d (toggle 2)
+
 
         }
-        )))
+;; Layer 2: Numeric Keypad
+    {
+        :k50 "RESET"  ; Easier than hitting the reset button
+
+        :k49 :kp-7
+        :k4a :kp-8
+        :k4b :kp-9
+        :k39 :kp-4
+        :k3a :kp-5
+        :k3b :kp-6
+        :k29 :kp-1
+        :k2a :kp-2
+        :k2b :kp-3
+        :k1b :kp-dot
+        :k5a :kp-slash
+        :k5b :kp-asterisk
+        :k5c :kp-minus
+        :k4c :kp-plus
+        :k3c :kp-plus
+        :k2c :kp-enter 
+        :k1c :kp-enter
+        :k0a :kp-0
+
+    }
+
+
+                )))
