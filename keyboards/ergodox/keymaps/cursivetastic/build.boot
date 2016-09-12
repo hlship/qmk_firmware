@@ -205,7 +205,7 @@
             :k32 :ms-down
             :k33 :ms-right
             :k41 :ms-btn1
-            :k43a :ms-btn2
+            :k43 :ms-btn2
 
             :k29 :audio-mute
             :k2a :audio-vol-down
