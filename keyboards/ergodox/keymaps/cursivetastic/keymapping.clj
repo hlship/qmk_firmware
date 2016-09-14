@@ -30,7 +30,11 @@
           (iterate inc 0)))
 
 (def key*
-  "Map common QWERTY keys to keymap pos key. This is the majority of layer zero."
+  "Map common QWERTY keys to keymap pos key. This is the majority of layer zero.
+
+  The keys and values are converted to keywords.  This is not only used to define
+  layer 0 (by inverting the map), but is also used by the key macro to convert
+  key names back into keymap position keywords."
   (reduce-kv (fn [m k v]
                ;; Convert to string first, allows numbers to be converted to
                ;; keywords.
@@ -55,7 +59,7 @@
                j        k39
                k        k3a
                l        k3b
-               scolon   k3c
+               scolon   k3c                                 ; semicolon
                z        k21
                x        k22
                c        k23
@@ -78,7 +82,7 @@
                0        k5c
                esc      k50
                tab      k40
-               grave    k11
+               grave    k11                                 ; backtick
                bslash   k12
                delete   k02
                lbracket k05
@@ -93,7 +97,7 @@
                rbracket k08
                pgup     k09
                pgdown   k0c
-               left     k19
+               left     k19                                 ; bottom row of RHS
                down     k1a
                up       k1b
                right    k1c
@@ -107,8 +111,8 @@
   (let [k (-> x str keyword key*)]
     (or k
         (throw (ex-info "Bad param to key."
-                        {:bad-key x
-                         :keys    (keys key*)})))))
+                        {:key        x
+                         :valid-keys (keys key*)})))))
 
 (defprotocol Render
   (render [x]))
@@ -184,126 +188,120 @@
     (print (keymap km))
     (println ",")))
 
-(defn write-to-file
-  [file]
+(defn write-keymaps
+  "Writes the keymap data to *out*.  Normally, this is written to the file keymap-gen.h."
+  []
+  (keymaps (merge (map-invert key*)
+                  {:k56     :lalt
+                   :k46     :lctrl
+                   :k30     :caps
+                   :k20     :lspo                           ; left shift or open paren
+                   :k26     :lgui
+                   lh-left  :left
+                   lh-right :right
 
-  (println "Writing to:" (.getPath file))
+                   :k10     (momentary 3)                   ; Clojure key
+                   :k06     (momentary 1)                   ; fn key
 
-  (binding [*out* (io/writer file)]
-    (keymaps (merge (map-invert key*)
-                    {:k56     :lalt
-                     :k46     :lctrl
-                     :k30     :caps
-                     :k20     :lspo                         ; left shift or open paren
-                     :k26     :lgui
-                     lh-left  :left
-                     lh-right :right
+                   :k57     :ralt
+                   :k47     :rctrl
+                   :k27     :rgui
+                   :k2d     :rspc                           ; right shift or close paren
+                   :k1d     (momentary 3)                   ; Clojure key
+                   :k07     (momentary 1)})                 ; fn key
+           ;; Layer 1: Function keys and A/V controls
+           {(key 1)      :f1
+            (key 2)      :f2
+            (key 3)      :f3
+            (key 4)      :f4
+            (key 5)      :f5
+            (key 6)      :f6
+            (key 7)      :f7
+            (key 8)      :f8
+            (key 9)      :f9
+            (key 0)      :f10
+            (key p)      :f11
+            (key scolon) :f12
+            (key slash)  :f13
+            (key right)  :f14
 
-                     :k10     (momentary 3)                 ; Clojure key
-                     :k06     (momentary 1)                 ; fn key
+            (key i)      :up
+            (key j)      :left
+            (key k)      :down
+            (key l)      :right
 
-                     :k57     :ralt
-                     :k47     :rctrl
-                     :k27     :rgui
-                     :k2d     :rspc                         ; right shift or close paren
-                     :k1d     (momentary 3)                 ; Clojure key
-                     :k07     (momentary 1)                 ; fn key
-                     })
-             ;; Layer 1: Function keys and A/V controls
-             {(key 1)      :f1
-              (key 2)      :f2
-              (key 3)      :f3
-              (key 4)      :f4
-              (key 5)      :f5
-              (key 6)      :f6
-              (key 7)      :f7
-              (key 8)      :f8
-              (key 9)      :f9
-              (key 0)      :f10
-              (key p)      :f11
-              (key scolon) :f12
-              (key slash)  :f13
-              (key right)  :f14
+            (key w)      :ms-up
+            (key a)      :ms-left
+            (key s)      :ms-down
+            (key d)      :ms-right
+            (key q)      :ms-btn1
+            (key e)      :ms-btn2
 
-              (key i)      :up
-              (key j)      :left
-              (key k)      :down
-              (key l)      :right
+            (key m)      :audio-mute
+            (key comma)  :audio-vol-down
+            (key dot)    :audio-vol-up
 
-              (key w)      :ms-up
-              (key a)      :ms-left
-              (key s)      :ms-down
-              (key d)      :ms-right
-              (key q)      :ms-btn1
-              (key e)      :ms-btn2
+            (key c)      :media-play-pause
+            (key v)      :media-prev-track
+            (key b)      :media-next-track
 
-              (key m)      :audio-mute
-              (key comma)  :audio-vol-down
-              (key dot)    :audio-vol-up
+            (key equal)  (toggle 2)}
+           ;; Layer 2: Numeric Keypad
+           {(key esc)    "RESET"                            ; Easier than using a paper clip
 
-              (key c)      :media-play-pause
-              (key v)      :media-prev-track
-              (key b)      :media-next-track
-
-              (key equal)  (toggle 2)}
-             ;; Layer 2: Numeric Keypad
-             {(key esc)    "RESET"                          ; Easier than hitting the reset button
-
-              (key u)      :kp-7
-              (key i)      :kp-8
-              (key o)      :kp-9
-              (key j)      :kp-4
-              (key k)      :kp-5
-              (key l)      :kp-6
-              (key m)      :kp-1
-              (key comma)  :kp-2
-              (key dot)    :kp-3
-              (key up)     :kp-dot
-              (key 8)      :kp-slash
-              (key 9)      :kp-asterisk
-              (key 0)      :kp-minus
-              (key p)      :kp-plus
-              (key scolon) :kp-plus
-              (key slash)  :kp-enter
-              (key right)  :kp-enter
-              (key space)  :kp-0
-              }
-             ;; Layer 3: Cursive/IntelliJ
-             {(key v)      (ctrl-alt :d)                    ; move forward into sexp
-              (key r)      (ctrl-alt :n)                    ; move forward out of sexp
-              (key c)      (ctrl-alt :p)                    ; move backward into sexp
-              (key d)      (ctrl-alt :b)                    ; move backward
-              (key e)      (ctrl-alt :u)                    ; move backward out of sexp
-              (key f)      (ctrl-alt :f)                    ; move forward
-              (key bspace) (ctrl-shift :c)                  ; clear repl output
-              (key tab)    (ctrl-shift :t)                  ; run tests in ns in repl
-              (key q)      (ctrl-alt-gui :t)                ; run test under cursor in repl
-              (key z)      (ctrl-shift :e)                  ; send form before carat to repl
-              (key a)      (ctrl-shift :n)                  ; switch repl ns to current file
-              (key 2)      (gui :f12)                       ; file structure
-              (key 1)      (alt :f1)                        ; navigate / select in ...
-              (key enter)  (ctrl-shift :m)                  ; load file in repl
-              (key space)  (ctrl-shift :o)                  ; [open] namespace ...
-              (key w)      (ctrl-shift :lbracket)           ; barf backwards
-              (key s)      (ctrl-gui :j)                    ; slurp backwards
-              (key j)      (alt-shift :s)                   ; split
-              (key t)      (ctrl-shift :rbracket)           ; barf forwards
-              (key g)      (ctrl-shift :0)                  ; slurp forwards
-              (key b)      (ctrl-gui :s)                    ; join
-              (key k)      (alt :s)                         ; splice
-              (key comma)  (alt-gui :comma)                 ; thread form
-              (key dot)    (alt-gui :dot)                   ; unthread form
-              (key p)      (gui-shift :a)                   ; find action ...
-              (key 6)      (shift :f6)                      ; rename ...
-              (key scolon) (alt-gui :l)                     ; reformat
-              (key quote)  (gui :quote)                     ; raise
-              (key x)      (gui :quote)                     ; raise
-              (key 7)      (alt :f7)                        ; find usages
-              (key up)     (alt-gui :up)                    ; previous occurance (search)
-              (key down)   (alt-gui :down)                  ; next occurance (search)
-              (key y)      (ctrl-shift :j)                  ; join lines
-              lh-left      (gui-shift :up)                  ; move form up
-              (key left)   (gui-shift :up)
-              (key right)  (gui-shift :down)                ; move form down
-              lh-right     (gui-shift :down)
-              })))
+            (key u)      :kp-7
+            (key i)      :kp-8
+            (key o)      :kp-9
+            (key j)      :kp-4
+            (key k)      :kp-5
+            (key l)      :kp-6
+            (key m)      :kp-1
+            (key comma)  :kp-2
+            (key dot)    :kp-3
+            (key up)     :kp-dot
+            (key 8)      :kp-slash
+            (key 9)      :kp-asterisk
+            (key 0)      :kp-minus
+            (key p)      :kp-plus
+            (key scolon) :kp-plus
+            (key slash)  :kp-enter
+            (key right)  :kp-enter
+            (key space)  :kp-0}
+           ;; Layer 3: Cursive/IntelliJ
+           {(key v)      (ctrl-alt :d)                      ; move forward into sexp
+            (key r)      (ctrl-alt :n)                      ; move forward out of sexp
+            (key c)      (ctrl-alt :p)                      ; move backward into sexp
+            (key d)      (ctrl-alt :b)                      ; move backward
+            (key e)      (ctrl-alt :u)                      ; move backward out of sexp
+            (key f)      (ctrl-alt :f)                      ; move forward
+            (key bspace) (ctrl-shift :c)                    ; clear repl output
+            (key tab)    (ctrl-shift :t)                    ; run tests in ns in repl
+            (key q)      (ctrl-alt-gui :t)                  ; run test under cursor in repl
+            (key z)      (ctrl-shift :e)                    ; send form before carat to repl
+            (key a)      (ctrl-shift :n)                    ; switch repl ns to current file
+            (key 2)      (gui :f12)                         ; file structure
+            (key 1)      (alt :f1)                          ; navigate / select in ...
+            (key enter)  (ctrl-shift :m)                    ; load file in repl
+            (key space)  (ctrl-shift :o)                    ; [open] namespace ...
+            (key w)      (ctrl-shift :lbracket)             ; barf backwards
+            (key s)      (ctrl-gui :j)                      ; slurp backwards
+            (key j)      (alt-shift :s)                     ; split
+            (key t)      (ctrl-shift :rbracket)             ; barf forwards
+            (key g)      (ctrl-shift :0)                    ; slurp forwards
+            (key b)      (ctrl-gui :s)                      ; join
+            (key k)      (alt :s)                           ; splice
+            (key comma)  (alt-gui :comma)                   ; thread form
+            (key dot)    (alt-gui :dot)                     ; unthread form
+            (key p)      (gui-shift :a)                     ; find action ...
+            (key 6)      (shift :f6)                        ; rename ...
+            (key scolon) (alt-gui :l)                       ; reformat
+            (key quote)  (gui :quote)                       ; raise
+            (key x)      (gui :quote)                       ; raise
+            (key 7)      (alt :f7)                          ; find usages
+            (key up)     (alt-gui :up)                      ; previous occurance (search)
+            (key down)   (alt-gui :down)                    ; next occurance (search)
+            (key y)      (ctrl-shift :j)                    ; join lines
+            lh-left      (gui-shift :up)                    ; move form up
+            (key left)   (gui-shift :up)
+            (key right)  (gui-shift :down)                  ; move form down
+            lh-right     (gui-shift :down)}))
