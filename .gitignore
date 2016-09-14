@@ -30,3 +30,4 @@ CMakeLists.txt
 .browse.VC.db*
 *.stackdump
 .nrepl-history
+*.iml
