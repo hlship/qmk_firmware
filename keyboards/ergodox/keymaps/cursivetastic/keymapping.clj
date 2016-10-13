@@ -195,7 +195,7 @@
                   {:k56     :lalt
                    :k46     :lctrl
                    :k30     :caps
-                   :k20     :lspo                           ; left shift or open paren
+                   :k20     :lshift
                    :k26     :lgui
                    lh-left  :left
                    lh-right :right
@@ -206,7 +206,7 @@
                    :k57     :ralt
                    :k47     :rctrl
                    :k27     :rgui
-                   :k2d     :rspc                           ; right shift or close paren
+                   :k2d     :rshift
                    :k1d     (momentary 3)                   ; Clojure key
                    :k07     (momentary 1)})                 ; fn key
            ;; Layer 1: Function keys and A/V controls
