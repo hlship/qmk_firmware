@@ -2,7 +2,6 @@
   (:refer-clojure :exclude [key])
   (:require
     [clojure.string :as str]
-    [clojure.java.io :as io]
     [clojure.set :refer [map-invert]])
   (:import
     (clojure.lang Keyword)))
@@ -184,9 +183,11 @@
   [layer] (fn-call "TG" layer))
 
 (defn keymaps [& keymaps]
+  (println "const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {")
   (doseq [km keymaps]
     (print (keymap km))
-    (println ",")))
+    (println ","))
+  (println "};"))
 
 (defn write-keymaps
   "Writes the keymap data to *out*.  Normally, this is written to the file keymap-gen.h."

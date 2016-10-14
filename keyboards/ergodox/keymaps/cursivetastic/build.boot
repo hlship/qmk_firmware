@@ -1,4 +1,4 @@
-(set-env! :resource-paths #{"."})
+(set-env! :resource-paths #{"src"})
 
 (require
   '[clojure.java.io :as io]
@@ -11,6 +11,8 @@
          [f file PATH file "Output file."]
 
          (println "Writing to:" (.getPath file))
+
+         (-> file .getParentFile .mkdirs)
 
          (binding [*out* (io/writer file)]
            (write-keymaps)))
