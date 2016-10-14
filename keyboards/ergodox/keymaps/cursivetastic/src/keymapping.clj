@@ -169,6 +169,51 @@
 (def alt-gui (comp alt gui))
 (def gui-shift (comp gui shift))
 
+(def macro-id-generator
+  "Generator of unique ids for macros."
+  (atom 0))
+
+(defprotocol Macro
+
+  (macro-id [this]
+    "Unique macro id. Used for the case statement.")
+
+  (macro-source [this]
+    "Returns string of C source code for when event pressed for this macro."))
+
+(defn macro
+  "Defines a simple macro in terms of sequence of keys to be pressed.
+
+  The terms must be renderable (e.g., keywords)."
+  [& terms]
+  (let [id (swap! macro-id-generator inc)]
+    (reify Render
+
+      (render [_] (str "M(" id ")"))
+
+      Macro
+
+      (macro-id [_] id)
+
+      (macro-source [_]
+        (str "MACRO("
+             (->> terms
+                  (map render)
+                  (str/join ", "))
+             ", END)")))))
+
+(defn alt-z
+  [key]
+  ;; macros are tricky, you can't directly use key combinations, you have
+  ;; to be explicit about UP and DOWN with a simple (unmodified) keycode.
+  ;; TYPE is just DOWN then UP.
+  ;; Reading the documentation, you see examples like T(A) ...
+  ;; which is translated to TYPE(KC_A).
+  (macro (fn-call "DOWN" :lalt)
+         (fn-call "TYPE" :z)
+         (fn-call "UP" :lalt)
+         (fn-call "TYPE" key)))
+
 (defn momentary
   "Change layer while key held (like shift key)"
   [layer]
@@ -182,12 +227,35 @@
   "Toggle layer until layer is toggled again (like caps lock)"
   [layer] (fn-call "TG" layer))
 
+
+(defn macro-support
+  [keymaps]
+  (let []
+    (println
+      "const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
+{
+  if (record->event.pressed) {
+    switch(id) {")
+
+    (doseq [m (->> keymaps
+                   (mapcat vals)
+                   (filter #(extends? Macro (class %))))]
+      (println (str "      case " (macro-id m) ": return "
+                    (macro-source m) ";")))
+
+    (println "    }
+  }
+  return MACRO_NONE;
+};")))
+
 (defn keymaps [& keymaps]
   (println "const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {")
   (doseq [km keymaps]
     (print (keymap km))
     (println ","))
-  (println "};"))
+  (println "};\n")
+
+  (macro-support keymaps))
 
 (defn write-keymaps
   "Writes the keymap data to *out*.  Normally, this is written to the file keymap-gen.h."
@@ -302,6 +370,8 @@
             (key up)     (alt-gui :up)                      ; previous occurance (search)
             (key down)   (alt-gui :down)                    ; next occurance (search)
             (key y)      (ctrl-shift :j)                    ; join lines
+            (key home)   (alt-z :left)                      ; last edit location
+            (key end)    (alt-z :right)                     ; next edit location
             lh-left      (gui-shift :up)                    ; move form up
             (key left)   (gui-shift :up)
             (key right)  (gui-shift :down)                  ; move form down

@@ -9,19 +9,6 @@
 const uint16_t PROGMEM fn_actions[] = {
 };
 
-const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
-{
-  // MACRODOWN only works in this function
-      switch(id) {
-        case 0:
-        if (record->event.pressed) {
-          SEND_STRING (QMK_KEYBOARD "/" QMK_KEYMAP " @ " QMK_VERSION);
-        }
-        break;
-      }
-    return MACRO_NONE;
-};
-
 // Runs just one time when the keyboard initializes.
 void matrix_init_user(void) {
 
