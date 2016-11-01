@@ -345,6 +345,7 @@
             (key f)      (ctrl-alt :f)                      ; move forward
             (key bspace) (ctrl-shift :c)                    ; clear repl output
             (key tab)    (ctrl-shift :t)                    ; run tests in ns in repl
+            (key esc)    (gui-shift :bspace)                ; clear all test markers
             (key q)      (ctrl-alt-gui :t)                  ; run test under cursor in repl
             (key z)      (ctrl-shift :e)                    ; send form before carat to repl
             (key a)      (ctrl-shift :n)                    ; switch repl ns to current file
