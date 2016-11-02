@@ -314,6 +314,11 @@
             (key v)      :media-prev-track
             (key b)      :media-next-track
 
+            ;; The backtick key is a bit hard to reach, this make fn-escape
+            ;; produce a backtick as well.
+            (key esc)    :grave
+
+            ;; Layer 2 is the numeric keypad
             (key equal)  (toggle 2)}
            ;; Layer 2: Numeric Keypad
            {(key esc)    "RESET"                            ; Easier than using a paper clip
