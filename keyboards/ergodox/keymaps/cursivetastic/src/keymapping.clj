@@ -202,17 +202,25 @@
                   (str/join ", "))
              ", END)")))))
 
-(defn alt-z
-  [key]
+(defn two-keys
+  [modifier first-key second-key]
   ;; macros are tricky, you can't directly use key combinations, you have
   ;; to be explicit about UP and DOWN with a simple (unmodified) keycode.
   ;; TYPE is just DOWN then UP.
   ;; Reading the documentation, you see examples like T(A) ...
   ;; which is translated to TYPE(KC_A).
-  (macro (fn-call "DOWN" :lalt)
-         (fn-call "TYPE" :z)
-         (fn-call "UP" :lalt)
-         (fn-call "TYPE" key)))
+  (macro (fn-call "DOWN" modifier)
+         (fn-call "TYPE" first-key)
+         (fn-call "UP" modifier)
+         (fn-call "TYPE" second-key)))
+
+(defn alt-z
+  [key]
+  (two-keys :lalt :z key))
+
+(defn ctrl-w
+  [key]
+  (two-keys :lctrl :w key))
 
 (defn momentary
   "Change layer while key held (like shift key)"
@@ -378,9 +386,10 @@
             (key up)       (alt-gui :up)                    ; previous occurance (search)
             (key down)     (alt-gui :down)                  ; next occurance (search)
             (key y)        (ctrl-shift :j)                  ; join lines
+            (key minus)    (ctrl-w :p)                      ; pin active tab
             (key home)     (alt-z :left)                    ; last edit location
             (key end)      (alt-z :right)                   ; next edit location
-            lh-left        (gui-shift :up)                  ; move form up
-            (key left)     (gui-shift :up)
-            (key right)    (gui-shift :down)                ; move form down
-            lh-right       (gui-shift :down)}))
+            lh-left        (ctrl-w :left)                   ; select previous tab
+            lh-right       (ctrl-w :right)                  ; select next tab
+            (key left)     (gui-shift :up)                  ; move form up
+            (key right)    (gui-shift :down)}))             ; move form down
