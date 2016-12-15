@@ -164,6 +164,7 @@
 
 (def ctrl-shift (comp shift ctrl))
 (def ctrl-alt (comp ctrl alt))
+(def ctrl-alt-shift (comp ctrl alt shift))
 (def ctrl-gui (comp ctrl gui))
 (def alt-shift (comp alt shift))
 (def alt-gui (comp alt gui))
@@ -389,6 +390,8 @@
             (key minus)    (ctrl-w :p)                      ; pin active tab
             (key home)     (alt-z :left)                    ; last edit location
             (key end)      (alt-z :right)                   ; next edit location
+            (key pgup)     (ctrl-alt-shift :up)             ; previous change
+            (key pgdown)   (ctrl-alt-shift :down)           ; next change
             lh-left        (ctrl-w :left)                   ; select previous tab
             lh-right       (ctrl-w :right)                  ; select next tab
             (key left)     (gui-shift :up)                  ; move form up
