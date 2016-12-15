@@ -376,6 +376,7 @@
             (key g)        (ctrl-shift :0)                  ; slurp forwards
             (key b)        (ctrl-gui :s)                    ; join
             (key k)        (alt :s)                         ; splice
+            (key delete)   (ctrl-alt :k)                    ; kill sexp
             (key comma)    (alt-gui :comma)                 ; thread form
             (key dot)      (alt-gui :dot)                   ; unthread form
             (key p)        (gui-shift :a)                   ; find action ...
