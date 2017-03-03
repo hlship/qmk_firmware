@@ -4,6 +4,8 @@ This is based on the ErgoDox EZ default configuration, but is a complete rewrite
 
 I use Clojure (via Boot) to build the main portion of the keymap:
 
+    cd keyboards/ergodox/keymaps/cursivetastic/
+
     boot write-keymap -f target/keymap.h
 
 This makes it easier to define new layers in terms of just the keys that change on that

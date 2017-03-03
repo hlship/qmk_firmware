@@ -59,6 +59,7 @@
                k        k3a
                l        k3b
                scolon   k3c                                 ; semicolon
+               lshift   k20
                z        k21
                x        k22
                c        k23
@@ -69,6 +70,7 @@
                comma    k2a
                dot      k2b
                slash    k2c
+               rshift   k2d
                1        k51
                2        k52
                3        k53
@@ -273,7 +275,6 @@
                   {:k56     :lalt
                    :k46     :lctrl
                    :k30     :caps
-                   :k20     :lshift
                    :k26     :lgui
                    lh-left  :left
                    lh-right :right
@@ -284,7 +285,6 @@
                    :k57     :ralt
                    :k47     :rctrl
                    :k27     :rgui
-                   :k2d     :rshift
                    :k1d     (momentary 3)                   ; Clojure key
                    :k07     (momentary 1)})                 ; fn key
            ;; Layer 1: Function keys and A/V controls
@@ -395,5 +395,7 @@
             (key pgdown)   (ctrl-alt-shift :down)           ; next change
             lh-left        (ctrl-w :left)                   ; select previous tab
             lh-right       (ctrl-w :right)                  ; select next tab
+            (key lshift)   (ctrl-w :n)                      ; goto prev splitter
+            (key rshift)   (ctrl-w :m)                      ; goto next splitter
             (key left)     (gui-shift :up)                  ; move form up
             (key right)    (gui-shift :down)}))             ; move form down
