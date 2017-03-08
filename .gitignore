@@ -31,3 +31,6 @@ CMakeLists.txt
 *.stackdump
 .nrepl-history
 *.iml
+util/Win_Check_Output.txt
+.vscode
+.stfolder

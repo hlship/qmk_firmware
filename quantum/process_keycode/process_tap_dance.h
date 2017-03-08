@@ -9,6 +9,7 @@
 typedef struct
 {
   uint8_t count;
+  uint8_t oneshot_mods;
   uint16_t keycode;
   uint16_t timer;
   bool interrupted;
@@ -39,15 +40,17 @@ typedef struct
 
 #define ACTION_TAP_DANCE_DOUBLE(kc1, kc2) { \
     .fn = { NULL, qk_tap_dance_pair_finished, qk_tap_dance_pair_reset }, \
-    .user_data = (void *)&((qk_tap_dance_pair_t) { kc1, kc2 })  \
+    .user_data = (void *)&((qk_tap_dance_pair_t) { kc1, kc2 }),  \
   }
 
 #define ACTION_TAP_DANCE_FN(user_fn) {  \
-    .fn = { NULL, user_fn, NULL } \
+    .fn = { NULL, user_fn, NULL }, \
+    .user_data = NULL, \
   }
 
-#define ACTION_TAP_DANCE_FN_ADVANCED(user_fn_on_each_tap, user_fn_on_dance_finished, user_fn_on_reset) { \
-    .fn = { user_fn_on_each_tap, user_fn_on_dance_finished, user_fn_on_reset } \
+#define ACTION_TAP_DANCE_FN_ADVANCED(user_fn_on_each_tap, user_fn_on_dance_finished, user_fn_on_dance_reset) { \
+    .fn = { user_fn_on_each_tap, user_fn_on_dance_finished, user_fn_on_dance_reset }, \
+    .user_data = NULL, \
   }
 
 extern qk_tap_dance_action_t tap_dance_actions[];
