@@ -327,6 +327,9 @@
             ;; produce a backtick as well.
             (key esc)    :grave
 
+            ;; Likewise, easy way to create a pipe char:
+            (key space)  :pipe
+
             ;; Layer 2 is the numeric keypad
             (key equal)  (toggle 2)}
            ;; Layer 2: Numeric Keypad
@@ -385,8 +388,8 @@
             (key quote)    (gui :quote)                     ; raise
             (key x)        (gui :quote)                     ; raise
             (key 7)        (alt :f7)                        ; find usages
-            (key up)       (alt-gui :up)                    ; previous occurance (search)
-            (key down)     (alt-gui :down)                  ; next occurance (search)
+            (key up)       (alt-gui :up)                    ; previous occurrence (search)
+            (key down)     (alt-gui :down)                  ; next occurrence (search)
             (key y)        (ctrl-shift :j)                  ; join lines
             (key minus)    (ctrl-w :p)                      ; pin active tab
             (key home)     (alt-z :left)                    ; last edit location
