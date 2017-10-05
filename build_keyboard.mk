@@ -31,8 +31,6 @@ $(error MASTER does not have a valid value(left/right))
     endif
 endif
 
-
-
 KEYBOARD_PATH := keyboards/$(KEYBOARD)
 KEYBOARD_C := $(KEYBOARD_PATH)/$(KEYBOARD).c
 
@@ -41,7 +39,7 @@ ifneq ("$(wildcard $(KEYBOARD_C))","")
 else
     $(error "$(KEYBOARD_C)" does not exist)
 endif
-
+OPT_DEFS += -DKEYBOARD_$(KEYBOARD)
 
 ifneq ($(SUBPROJECT),)
     SUBPROJECT_PATH := keyboards/$(KEYBOARD)/$(SUBPROJECT)
@@ -93,17 +91,19 @@ MAIN_KEYMAP_C := $(MAIN_KEYMAP_PATH)/keymap.c
 SUBPROJ_KEYMAP_PATH := $(SUBPROJECT_PATH)/keymaps/$(KEYMAP)
 SUBPROJ_KEYMAP_C := $(SUBPROJ_KEYMAP_PATH)/keymap.c
 ifneq ("$(wildcard $(SUBPROJ_KEYMAP_C))","")
-    -include $(SUBPROJ_KEYMAP_PATH)/Makefile
+    -include $(SUBPROJ_KEYMAP_PATH)/rules.mk
     KEYMAP_C := $(SUBPROJ_KEYMAP_C)
     KEYMAP_PATH := $(SUBPROJ_KEYMAP_PATH)
 else ifneq ("$(wildcard $(MAIN_KEYMAP_C))","")
-    -include $(MAIN_KEYMAP_PATH)/Makefile
+    -include $(MAIN_KEYMAP_PATH)/rules.mk
     KEYMAP_C := $(MAIN_KEYMAP_C)
     KEYMAP_PATH := $(MAIN_KEYMAP_PATH)
+else ifneq ($(LAYOUTS),)
+    include build_layout.mk
 else
-    $(error "$(MAIN_KEYMAP_C)/keymap.c" does not exist)
+    $(error Could not find keymap)
+    # this state should never be reached
 endif
-
 
 # Object files directory
 #     To put object files in current directory, use a dot (.), do NOT make
@@ -118,137 +118,10 @@ endif
 # # project specific files
 SRC += $(KEYBOARD_C) \
     $(KEYMAP_C) \
-    $(QUANTUM_DIR)/quantum.c \
-    $(QUANTUM_DIR)/keymap_common.c \
-    $(QUANTUM_DIR)/keycode_config.c \
-    $(QUANTUM_DIR)/process_keycode/process_leader.c
+    $(QUANTUM_SRC)
 
 ifneq ($(SUBPROJECT),)
     SRC += $(SUBPROJECT_C)
-endif
-
-ifndef CUSTOM_MATRIX
-    SRC += $(QUANTUM_DIR)/matrix.c
-endif
-
-ifeq ($(strip $(API_SYSEX_ENABLE)), yes)
-    OPT_DEFS += -DAPI_SYSEX_ENABLE
-    SRC += $(QUANTUM_DIR)/api/api_sysex.c
-    OPT_DEFS += -DAPI_ENABLE
-    SRC += $(QUANTUM_DIR)/api.c
-    MIDI_ENABLE=yes
-endif
-
-MUSIC_ENABLE := 0
-
-ifeq ($(strip $(AUDIO_ENABLE)), yes)
-    OPT_DEFS += -DAUDIO_ENABLE
-    MUSIC_ENABLE := 1
-    SRC += $(QUANTUM_DIR)/process_keycode/process_audio.c
-    SRC += $(QUANTUM_DIR)/audio/audio.c
-    SRC += $(QUANTUM_DIR)/audio/voices.c
-    SRC += $(QUANTUM_DIR)/audio/luts.c
-endif
-
-ifeq ($(strip $(MIDI_ENABLE)), yes)
-    OPT_DEFS += -DMIDI_ENABLE
-    MUSIC_ENABLE := 1
-    SRC += $(QUANTUM_DIR)/process_keycode/process_midi.c
-endif
-
-ifeq ($(MUSIC_ENABLE), 1)
-    SRC += $(QUANTUM_DIR)/process_keycode/process_music.c
-endif
-
-ifeq ($(strip $(COMBO_ENABLE)), yes)
-    OPT_DEFS += -DCOMBO_ENABLE
-    SRC += $(QUANTUM_DIR)/process_keycode/process_combo.c
-endif
-
-ifeq ($(strip $(VIRTSER_ENABLE)), yes)
-    OPT_DEFS += -DVIRTSER_ENABLE
-endif
-
-ifeq ($(strip $(FAUXCLICKY_ENABLE)), yes)
-    OPT_DEFS += -DFAUXCLICKY_ENABLE
-    SRC += $(QUANTUM_DIR)/fauxclicky.c
-endif
-
-ifeq ($(strip $(UCIS_ENABLE)), yes)
-    OPT_DEFS += -DUCIS_ENABLE
-    UNICODE_COMMON = yes
-    SRC += $(QUANTUM_DIR)/process_keycode/process_ucis.c
-endif
-
-ifeq ($(strip $(UNICODEMAP_ENABLE)), yes)
-    OPT_DEFS += -DUNICODEMAP_ENABLE
-    UNICODE_COMMON = yes
-    SRC += $(QUANTUM_DIR)/process_keycode/process_unicodemap.c
-endif
-
-ifeq ($(strip $(UNICODE_ENABLE)), yes)
-    OPT_DEFS += -DUNICODE_ENABLE
-    UNICODE_COMMON = yes
-    SRC += $(QUANTUM_DIR)/process_keycode/process_unicode.c
-endif
-
-ifeq ($(strip $(UNICODE_COMMON)), yes)
-    SRC += $(QUANTUM_DIR)/process_keycode/process_unicode_common.c
-endif
-
-ifeq ($(strip $(RGBLIGHT_ENABLE)), yes)
-    OPT_DEFS += -DRGBLIGHT_ENABLE
-    SRC += $(QUANTUM_DIR)/light_ws2812.c
-    SRC += $(QUANTUM_DIR)/rgblight.c
-    CIE1931_CURVE = yes
-    LED_BREATHING_TABLE = yes
-endif
-
-ifeq ($(strip $(TAP_DANCE_ENABLE)), yes)
-    OPT_DEFS += -DTAP_DANCE_ENABLE
-    SRC += $(QUANTUM_DIR)/process_keycode/process_tap_dance.c
-endif
-
-ifeq ($(strip $(PRINTING_ENABLE)), yes)
-    OPT_DEFS += -DPRINTING_ENABLE
-    SRC += $(QUANTUM_DIR)/process_keycode/process_printer.c
-    SRC += $(TMK_DIR)/protocol/serial_uart.c
-endif
-
-ifeq ($(strip $(SERIAL_LINK_ENABLE)), yes)
-    SRC += $(patsubst $(QUANTUM_PATH)/%,%,$(SERIAL_SRC))
-    OPT_DEFS += $(SERIAL_DEFS)
-    VAPTH += $(SERIAL_PATH)
-endif
-
-ifneq ($(strip $(VARIABLE_TRACE)),)
-    SRC += $(QUANTUM_DIR)/variable_trace.c
-    OPT_DEFS += -DNUM_TRACED_VARIABLES=$(strip $(VARIABLE_TRACE))
-ifneq ($(strip $(MAX_VARIABLE_TRACE_SIZE)),)
-    OPT_DEFS += -DMAX_VARIABLE_TRACE_SIZE=$(strip $(MAX_VARIABLE_TRACE_SIZE))
-endif
-endif
-
-ifeq ($(strip $(LCD_ENABLE)), yes)
-    CIE1931_CURVE = yes
-endif
-
-ifeq ($(strip $(LED_ENABLE)), yes)
-    CIE1931_CURVE = yes
-endif
-
-ifeq ($(strip $(CIE1931_CURVE)), yes)
-    OPT_DEFS += -DUSE_CIE1931_CURVE
-    LED_TABLES = yes
-endif
-
-ifeq ($(strip $(LED_BREATHING_TABLE)), yes)
-    OPT_DEFS += -DUSE_LED_BREATHING_TABLE
-    LED_TABLES = yes
-endif
-
-ifeq ($(strip $(LED_TABLES)), yes)
-    SRC += $(QUANTUM_DIR)/led_tables.c
 endif
 
 # Optimize size but this may cause error "relocation truncated to fit"
@@ -262,9 +135,10 @@ endif
 VPATH += $(KEYBOARD_PATH)
 VPATH += $(COMMON_VPATH)
 
+include common_features.mk
 include $(TMK_PATH)/protocol.mk
-
 include $(TMK_PATH)/common.mk
+
 SRC += $(TMK_COMMON_SRC)
 OPT_DEFS += $(TMK_COMMON_DEFS)
 EXTRALDFLAGS += $(TMK_COMMON_LDFLAGS)
@@ -286,7 +160,10 @@ endif
 
 OUTPUTS := $(KEYMAP_OUTPUT) $(KEYBOARD_OUTPUT)
 $(KEYMAP_OUTPUT)_SRC := $(SRC)
-$(KEYMAP_OUTPUT)_DEFS := $(OPT_DEFS) $(GFXDEFS) -DQMK_KEYBOARD=\"$(KEYBOARD)\" -DQMK_KEYMAP=\"$(KEYMAP)\"
+$(KEYMAP_OUTPUT)_DEFS := $(OPT_DEFS) $(GFXDEFS) \
+-DQMK_KEYBOARD=\"$(KEYBOARD)\" -DQMK_KEYBOARD_H=\"$(KEYBOARD).h\" -DQMK_KEYBOARD_CONFIG_H=\"$(KEYBOARD_PATH)/config.h\" \
+-DQMK_KEYMAP=\"$(KEYMAP)\" -DQMK_KEYMAP_H=\"$(KEYMAP).h\" -DQMK_KEYMAP_CONFIG_H=\"$(KEYMAP_PATH)/config.h\" \
+-DQMK_SUBPROJECT=\"$(SUBPROJECT)\" -DQMK_SUBPROJECT_H=\"$(SUBPROJECT).h\" -DQMK_SUBPROJECT_CONFIG_H=\"$(SUBPROJECT_PATH)/config.h\"
 $(KEYMAP_OUTPUT)_INC :=  $(VPATH) $(EXTRAINCDIRS)
 $(KEYMAP_OUTPUT)_CONFIG := $(CONFIG_H)
 $(KEYBOARD_OUTPUT)_SRC := $(CHIBISRC) $(GFXSRC)
@@ -304,4 +181,3 @@ build: elf hex
 
 
 include $(TMK_PATH)/rules.mk
-
