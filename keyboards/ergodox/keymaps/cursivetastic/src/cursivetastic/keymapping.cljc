@@ -399,11 +399,8 @@
     (keycode :right)    (gui-shift :down)}                  ; move form down
    ])
 
-(when-not (fs/existsSync "target")
-  (fs/mkdirSync "target"))
+(fs/writeFileSync "keymap.h" (keymap-file-content keymaps))
 
-(fs/writeFileSync "target/keymap.h" (keymap-file-content keymaps))
-
-(println "Wrote target/keymap.h")
+(println "Wrote keymap.h")
 
 
