@@ -326,6 +326,14 @@
     ;; Likewise, easy way to create a pipe char:
     (keycode :space)  :pipe
 
+    ;; This is really for Elixir coding: The |> operator
+
+    ;; This might be something that ca be done easier ...
+    (keycode :enter)  (macro (fn-call "DOWN" :lshift)
+                             (fn-call "TYPE" :bslash)
+                             (fn-call "TYPE" :dot)
+                             (fn-call "UP" :lshift))
+
     ;; Layer 2 is the numeric keypad
     (keycode :equal)  (toggle 2)}
    ;; Layer 2: Numeric Keypad
