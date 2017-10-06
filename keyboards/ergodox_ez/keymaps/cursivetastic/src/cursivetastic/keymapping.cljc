@@ -157,7 +157,7 @@
                   keymap)]
     ;; KEYMAP is a macro from ez.h that converts its arguments into nested arrays
     ;; with an even more arcane ordering.
-    (str "KEYMAP("
+    (str "LAYOUT_ergodox("
          (str/join ",\n  " ordered)
          ")")))
 
@@ -249,7 +249,8 @@
                           (str/join ",\n"))
         macro-lines (for [m (->> keymaps
                                  (mapcat vals)
-                                 (filter #(satisfies? Macro %)))]
+                                 (filter #(satisfies? Macro %))
+                                 (sort-by macro-id))]
                       (str "      case " (macro-id m) ": return "
                            (macro-source m) ";\n"))]
     (str "const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {\n"
@@ -399,8 +400,8 @@
     (keycode :right)    (gui-shift :down)}                  ; move form down
    ])
 
-(fs/writeFileSync "keymap.h" (keymap-file-content keymaps))
+(fs/writeFileSync "gen-keymap.h" (keymap-file-content keymaps))
 
-(println "Wrote keymap.h")
+(println "Wrote gen-keymap.h")
 
 
