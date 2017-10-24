@@ -388,7 +388,7 @@
     (keycode :dot)      (alt-gui :dot)                      ; unthread form
     (keycode \p)        (gui-shift :a)                      ; find action ...
     (keycode 6)         (shift :f6)                         ; rename ...
-    (keycode :scolon)   (alt-gui :l)                        ; reformat
+    (keycode :scolon)   (ctrl-w :r)                         ; reformat
     (keycode :quote)    (gui :quote)                        ; raise
     (keycode \x)        (gui :quote)                        ; raise
     (keycode 7)         (alt :f7)                           ; find usages
@@ -411,5 +411,3 @@
 (fs/writeFileSync "gen-keymap.h" (keymap-file-content keymaps))
 
 (println "Wrote gen-keymap.h")
-
-
