@@ -231,7 +231,7 @@
 (defn momentary
   "Change layer while key held (like shift key)"
   [layer]
-  (fn-call "MO" layer))
+    (fn-call "MO" layer))
 
 (defn one-shot
   "Activate layer just for next key"
@@ -383,11 +383,7 @@
     (keycode \g)        (ctrl-shift :0)                     ; slurp forwards
     (keycode \b)        (ctrl-gui :s)                       ; join
     (keycode \k)        (alt :s)                            ; splice
-    (keycode :delete)   (ctrl-alt :k)                       ; kill sexp
-    (keycode :comma)    (alt-gui :comma)                    ; thread form
-    (keycode :dot)      (alt-gui :dot)                      ; unthread form
-    (keycode \p)        (gui-shift :a)                      ; find action ...
-    (keycode 6)         (shift :f6)                         ; rename ...
+    (keycode :delete)   (ctrl-alt :k)                       ; kill sexp (keycode :comma)    (alt-gui :comma)                    ; thread form (keycode :dot)      (alt-gui :dot)                      ; unthread form (keycode \p)        (gui-shift :a)                      ; find action ... (keycode 6)         (shift :f6)                         ; rename ...
     (keycode :scolon)   (ctrl-w :r)                         ; reformat
     (keycode :quote)    (gui :quote)                        ; raise
     (keycode \x)        (gui :quote)                        ; raise
@@ -405,9 +401,11 @@
     (keycode :lshift)   (ctrl-w :n)                         ; goto prev splitter
     (keycode :rshift)   (ctrl-w :m)                         ; goto next splitter
     (keycode :left)     (gui-shift :up)                     ; move form up
-    (keycode :right)    (gui-shift :down)}                  ; move form down
+    (keycode :right)    (gui-shift :down)                   ; move form down
+    (keycode 0)         (ctrl-alt-gui :rbracket)            ; cycle collection type
+    }
    ])
 
-(fs/writeFileSync "gen-keymap.h" (keymap-file-content keymaps))
+  (fs/writeFileSync "gen-keymap.h" (keymap-file-content keymaps))
 
 (println "Wrote gen-keymap.h")
