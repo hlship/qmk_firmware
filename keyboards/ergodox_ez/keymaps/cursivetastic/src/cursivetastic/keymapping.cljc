@@ -383,7 +383,11 @@
     (keycode \g)        (ctrl-shift :0)                     ; slurp forwards
     (keycode \b)        (ctrl-gui :s)                       ; join
     (keycode \k)        (alt :s)                            ; splice
-    (keycode :delete)   (ctrl-alt :k)                       ; kill sexp (keycode :comma)    (alt-gui :comma)                    ; thread form (keycode :dot)      (alt-gui :dot)                      ; unthread form (keycode \p)        (gui-shift :a)                      ; find action ... (keycode 6)         (shift :f6)                         ; rename ...
+    (keycode :delete)   (ctrl-alt :k)                       ; kill sexp 
+    (keycode :comma)    (alt-gui :comma)                    ; thread form 
+    (keycode :dot)      (alt-gui :dot)                      ; unthread form
+    (keycode \p)        (gui-shift :a)                      ; find action ... 
+    (keycode 6)         (shift :f6)                         ; rename ...
     (keycode :scolon)   (ctrl-w :r)                         ; reformat
     (keycode :quote)    (gui :quote)                        ; raise
     (keycode \x)        (gui :quote)                        ; raise
